@@ -1,0 +1,19 @@
+version: '3.9'
+
+services:
+
+  book-manager-frontend:
+    container_name: book-manager-frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+
+  book-manager-backend:
+    container_name: book-manager-backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - 3001:3001
