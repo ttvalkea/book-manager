@@ -8,6 +8,7 @@ const app = express();
 // Enable CORS for all routes
 app.use(cors());
 
+// TODO: In addition to a page of books, this should return whether there are more books to be loaded or not.
 app.get("/books", async (req: Request, res: Response) => {
   const page = parseInt(req.query.page as string) || 0; // TODO: Should return an error, when page parameter is less than 0 or not an integer.
   const books = await fetchBooks(page);

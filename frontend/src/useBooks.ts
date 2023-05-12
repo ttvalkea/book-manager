@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export interface Book {
   title: string;
@@ -8,36 +8,51 @@ export interface Book {
 
 export interface UseBooksResult {
   books: Book[];
-  loading: boolean;
+  triggerNextPageFetch: () => void;
 }
 
 export function useBooks(): UseBooksResult {
+  const [pageWanted, setPageWanted] = useState(0);
+  const [lastFetchedPage, setLastFetchedPage] = useState(-1);
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    async function fetchBookList() {
-      try {
-        setLoading(true);
-        const response = await fetch(`http://localhost:3001/books`, {
-          method: "GET",
-          mode: "cors",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
+  function triggerNextPageFetch() {
+    setPageWanted(pageWanted + 1);
+  }
 
-        const result = await response.json();
+  const fetchBooksPage = useCallback(
+    async (page: number) => {
+      if (pageWanted !== lastFetchedPage && !loading) {
+        try {
+          setLoading(true);
+          const response = await fetch(
+            `http://localhost:3001/books?page=${page}`,
+            {
+              method: "GET",
+              mode: "cors",
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          );
 
-        setBooks(result);
-        setLoading(false);
-      } catch (error) {
-        setLoading(false);
+          const result = await response.json();
+
+          setBooks([...books, ...result]);
+          setLoading(false);
+          setLastFetchedPage(pageWanted);
+        } catch (error) {
+          setLoading(false);
+        }
       }
-    }
+    },
+    [books, lastFetchedPage, pageWanted, loading]
+  );
 
-    void fetchBookList();
-  }, []);
+  useEffect(() => {
+    void fetchBooksPage(pageWanted);
+  }, [pageWanted, fetchBooksPage]);
 
-  return { books, loading };
+  return { books, triggerNextPageFetch };
 }
