@@ -19,7 +19,7 @@ export function useBooks(): UseBooksResult {
     async function fetchBookList() {
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:3001`, {
+        const response = await fetch(`http://localhost:3001/books`, {
           method: "GET",
           mode: "cors",
           headers: {
