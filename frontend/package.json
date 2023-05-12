@@ -26,7 +26,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test --watchAll=false",
     "format": "npx prettier --write .",
-    "lint": "npx eslint . --ext .ts,.tsx --max-warnings=0"
+    "lint": "npx eslint . --ext .ts,.tsx --max-warnings=0",
+    "pretest": "npx tsc"
   },
   "eslintConfig": {
     "extends": [
