@@ -1,3 +1,12 @@
+import {
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@mui/material";
 import { useBooks } from "./useBooks";
 
 function BookList(): JSX.Element {
@@ -6,25 +15,28 @@ function BookList(): JSX.Element {
   if (loading) {
     return <div>Loading</div>;
   }
+
   return (
-    <table>
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Author</th>
-          <th>Timestamp</th>
-        </tr>
-      </thead>
-      <tbody>
-        {books.map((book, index) => (
-          <tr key={`${book.title}-${index}`}>
-            <td>{book.title}</td>
-            <td>{book.author}</td>
-            <td>{book.timestamp}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <TableContainer component={Paper}>
+      <Table>
+        <TableHead sx={{ backgroundColor: "antiquewhite" }}>
+          <TableRow>
+            <TableCell>Title</TableCell>
+            <TableCell>Author</TableCell>
+            <TableCell>Timestamp</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody sx={{ backgroundColor: "ghostwhite" }}>
+          {books.map((book, index) => (
+            <TableRow key={`${book.title}-${index}`}>
+              <TableCell>{book.title}</TableCell>
+              <TableCell>{book.author}</TableCell>
+              <TableCell>{book.timestamp}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </TableContainer>
   );
 }
 
