@@ -1,8 +1,9 @@
-import { Database, OPEN_READWRITE } from "sqlite3";
+import { Database } from "sqlite3";
+import { getDb } from "./getDb";
 
 export interface Book {
   title: string;
-  author: string;
+  author: string | null;
   timestamp: string;
 }
 
@@ -10,8 +11,7 @@ export function fetchBooks(
   page: number,
   dbConnection?: Database
 ): Promise<Book[]> {
-  // dbConnection parameter is used from tests
-  const db = dbConnection || new Database("./db/books.db", OPEN_READWRITE); // TODO: Error handling for opening
+  const db = getDb(dbConnection);
 
   const limit = 20;
   const offset = page * limit;
