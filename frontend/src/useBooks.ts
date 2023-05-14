@@ -1,3 +1,4 @@
+import { toast } from "material-react-toastify";
 import { useState, useEffect, useCallback } from "react";
 import { BookWithoutTimestamp, createBook, getPageOfBooks } from "./api";
 import { useBooksContext } from "./useBooksContext";
@@ -32,8 +33,9 @@ export function useBooks(): UseBooksResult {
           setLastFetchedPage(pageWanted);
           setLoading(false);
         } catch (error) {
-          //TODO: Error handling. Show a toast.
-          setLoading(false);
+          toast.error("An error occurred trying to fetch books.", {
+            autoClose: false,
+          });
         }
       }
     },
@@ -55,7 +57,9 @@ export function useBooks(): UseBooksResult {
 
         setLoading(false);
       } catch (error) {
-        //TODO: Error handling. Show a toast.
+        toast.error("An error occurred trying to create a book.", {
+          autoClose: false,
+        });
         setLoading(false);
       }
     },
