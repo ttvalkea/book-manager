@@ -1,58 +1,70 @@
 import { useState, useEffect, useCallback } from "react";
-
-export interface Book {
-  title: string;
-  author: string;
-  timestamp: string;
-}
+import { BookWithoutTimestamp, createBook, getPageOfBooks } from "./api";
+import { useBooksContext } from "./useBooksContext";
 
 export interface UseBooksResult {
-  books: Book[];
+  loading: boolean;
   triggerNextPageFetch: () => void;
+  addNewBook: (book: BookWithoutTimestamp) => Promise<void>;
 }
+
+// TODO: Tests for this hook
 
 export function useBooks(): UseBooksResult {
   const [pageWanted, setPageWanted] = useState(0);
   const [lastFetchedPage, setLastFetchedPage] = useState(-1);
-  const [books, setBooks] = useState<Book[]>([]);
-  const [loading, setLoading] = useState(false);
+  const { books, setBooks } = useBooksContext();
+  const [loading, setLoading] = useState(false); // TODO: loading state could be in BooksContext. Now loading state isn't shared between different users of useBooks hook.
 
   function triggerNextPageFetch() {
     setPageWanted(pageWanted + 1);
   }
 
-  const fetchBooksPage = useCallback(
+  const fetchNextPageOfBooks = useCallback(
     async (page: number) => {
       if (pageWanted !== lastFetchedPage && !loading) {
         try {
           setLoading(true);
-          const response = await fetch(
-            `http://localhost:3001/books?page=${page}`,
-            {
-              method: "GET",
-              mode: "cors",
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
 
-          const result = await response.json();
+          const pageOfBooks = await getPageOfBooks(page);
 
-          setBooks([...books, ...result]);
-          setLoading(false);
+          setBooks([...books, ...pageOfBooks]);
           setLastFetchedPage(pageWanted);
+          setLoading(false);
         } catch (error) {
+          //TODO: Error handling. Show a toast.
           setLoading(false);
         }
       }
     },
-    [books, lastFetchedPage, pageWanted, loading]
+    [books, lastFetchedPage, pageWanted, loading, setBooks]
+  );
+
+  const addNewBook = useCallback(
+    async (book: BookWithoutTimestamp) => {
+      try {
+        setLoading(true);
+
+        const newBook = await createBook(book);
+
+        // After user creates a new book, it's appended to the top of the list in the UI.
+        setBooks([newBook, ...books]);
+        // TODO: There's a problem with this. After appending, when user scrolls down, the page they receive has the last book from the previous page as its first book.
+        // To fix this problem of a duplicate being shown on the list, one option could be to check each book we receive from the API, and only add it to the
+        // list if it doesn't exist there already.
+
+        setLoading(false);
+      } catch (error) {
+        //TODO: Error handling. Show a toast.
+        setLoading(false);
+      }
+    },
+    [books, setBooks]
   );
 
   useEffect(() => {
-    void fetchBooksPage(pageWanted);
-  }, [pageWanted, fetchBooksPage]);
+    void fetchNextPageOfBooks(pageWanted);
+  }, [pageWanted, fetchNextPageOfBooks]);
 
-  return { books, triggerNextPageFetch };
+  return { loading, triggerNextPageFetch, addNewBook };
 }

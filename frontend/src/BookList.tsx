@@ -9,9 +9,11 @@ import {
 } from "@mui/material";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useBooks } from "./useBooks";
+import { useBooksContext } from "./useBooksContext";
 
 function BookList(): JSX.Element {
-  const { books, triggerNextPageFetch } = useBooks();
+  const { triggerNextPageFetch } = useBooks();
+  const { books } = useBooksContext();
 
   return (
     <InfiniteScroll

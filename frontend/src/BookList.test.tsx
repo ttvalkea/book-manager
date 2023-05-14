@@ -1,34 +1,41 @@
 import { render, screen, within } from "@testing-library/react";
 import BookList from "./BookList";
-import { useBooks, UseBooksResult } from "./useBooks";
+import { BooksContextProvider } from "./BooksContext";
+import { useBooksContext } from "./useBooksContext";
 
-jest.mock("./useBooks");
-const useBooksMock = useBooks as jest.MockedFunction<typeof useBooks>;
+jest.mock("./useBooksContext");
+const useBooksContextMock = useBooksContext as jest.MockedFunction<
+  typeof useBooksContext
+>;
+
+function renderComponent(): void {
+  render(
+    <BooksContextProvider>
+      <BookList />
+    </BooksContextProvider>
+  );
+}
 
 describe("BookList", () => {
-  let useBooksResult: UseBooksResult;
-  let triggerNextPageFetchFunction: () => void;
   beforeEach(() => {
-    triggerNextPageFetchFunction = jest.fn();
-    useBooksResult = {
+    useBooksContextMock.mockReturnValue({
       books: [
         { author: "Author 1", title: "Title 1", timestamp: "2000-1-1" },
         { author: "Author 2", title: "Title 2", timestamp: "2000-1-1" },
       ],
-      triggerNextPageFetch: triggerNextPageFetchFunction,
-    };
-    useBooksMock.mockReturnValue(useBooksResult);
+      setBooks: jest.fn(),
+    });
   });
 
   it("should render a table", () => {
-    render(<BookList />);
+    renderComponent();
 
     const booksTable = screen.getByRole("table");
     expect(booksTable).toBeInTheDocument();
   });
 
   it("should have headers Title, Author and Timestamp", () => {
-    render(<BookList />);
+    renderComponent();
 
     const headers = screen.getAllByRole("columnheader");
     expect(headers.length).toBe(3);
@@ -38,7 +45,7 @@ describe("BookList", () => {
   });
 
   it("should have table rows with title, author and timestamp", () => {
-    render(<BookList />);
+    renderComponent();
 
     const rows = screen.getAllByRole("row");
 
