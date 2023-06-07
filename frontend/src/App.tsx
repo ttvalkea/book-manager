@@ -9,7 +9,7 @@ function App(): JSX.Element {
     <Container>
       <ToastContainer />
       <Stack spacing={4}>
-        <Typography variant="h1">Book manager</Typography>
+        <Typography variant="h1">Book manager!</Typography>
         <BooksContextProvider>
           <BookForm />
           <BookList />
