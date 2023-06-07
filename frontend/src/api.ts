@@ -6,8 +6,10 @@ export interface Book {
 
 export type BookWithoutTimestamp = Omit<Book, "timestamp">;
 
+const host = process.env.REACT_APP_API_URL;
+
 export async function createBook(book: BookWithoutTimestamp): Promise<Book> {
-  const response = await fetch("http://localhost:3001/book", {
+  const response = await fetch(`${host}/book`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -23,7 +25,7 @@ export async function createBook(book: BookWithoutTimestamp): Promise<Book> {
 }
 
 export async function getPageOfBooks(page: number): Promise<Book[]> {
-  const response = await fetch(`http://localhost:3001/books?page=${page}`, {
+  const response = await fetch(`${host}/books?page=${page}`, {
     method: "GET",
     mode: "cors",
     headers: {
